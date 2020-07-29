@@ -7,7 +7,12 @@ export default new VueRouter({
     {
       path: '/',
       name: 'index',
-      component: () => import('pages/index.vue'),
+      component: () => import('pages/config.index.vue'),
+    },
+    {
+      path: '/controller',
+      name: 'controller',
+      component: () => import('pages/config/controller.vue'),
     },
   ],
 })

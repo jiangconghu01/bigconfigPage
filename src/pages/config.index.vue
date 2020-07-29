@@ -1,7 +1,5 @@
 <template>
-  <div class="app">
-    <router-view />
-  </div>
+  <div></div>
 </template>
 <script>
 export default {
@@ -15,10 +13,4 @@ export default {
   methods: {},
 }
 </script>
-<style lang="scss">
-@import url('./css/reset.scss');
-.app {
-  overflow: hidden;
-  height: 100%;
-}
-</style>
+<style lang=""></style>

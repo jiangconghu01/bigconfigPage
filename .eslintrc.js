@@ -25,7 +25,7 @@ module.exports = {
     'vue/no-unused-components': 'off',
     'vue/attribute-hyphenation': 0, // 忽略属性连字
     'vue/max-attributes-per-line': [
-      2,
+      5,
       { singleline: 10, multiline: { max: 1, allowFirstLine: false } },
     ], // 每行最大属性
     'vue/singleline-html-element-content-newline': 'off', // 单行html元素内容在新的一行
