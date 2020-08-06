@@ -1,10 +1,11 @@
 <template>
   <div>
-    /generate.html#/index
+    33333
   </div>
 </template>
 <script>
 export default {
+  name: 'FixedRemuneration',
   components: {},
   data() {
     return {}

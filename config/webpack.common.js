@@ -192,6 +192,13 @@ module.exports = {
       },
     ],
   },
-  plugins: pluginsArr,
+  plugins: [
+    ...pluginsArr,
+    new Webpack.ProvidePlugin({
+      $: 'jquery',
+      jQuery: 'jquery',
+      'window.jQuery': "jquery'",
+      'window.$': 'jquery',
+    }),
+  ],
 }
-console.log(process.env.NODE_ENV)

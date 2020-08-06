@@ -10,29 +10,23 @@ module.exports = {
     ecmaVersion: 2018,
     sourceType: 'module',
   },
-  extends: [
-    'eslint:recommended',
-    'plugin:vue/recommended',
-    'plugin:prettier/recommended',
-  ],
+  extends: ['eslint:recommended', 'plugin:vue/recommended', 'plugin:prettier/recommended'],
   plugins: ['vue', 'prettier'],
-  // add your custom rules here
   rules: {
     'no-console': process.env.NODE_ENV === 'production' ? 'error' : 'warn',
     'no-debugger': process.env.NODE_ENV === 'production' ? 'error' : 'warn',
     'no-unused-vars': 'warn',
     'prettier/prettier': 'warn',
     'vue/no-unused-components': 'off',
-    'vue/attribute-hyphenation': 0, // 忽略属性连字
-    'vue/max-attributes-per-line': [
-      5,
-      { singleline: 10, multiline: { max: 1, allowFirstLine: false } },
-    ], // 每行最大属性
-    'vue/singleline-html-element-content-newline': 'off', // 单行html元素内容在新的一行
-    'vue/multiline-html-element-content-newline': 'off', // 多行html元素内容在新的一行
-    'vue/html-closing-bracket-newline': 'off', // html右括号在新的一行
-    'vue/no-v-html': 'off', // 不使用v-html
-    'vue/html-self-closing': 0, // 忽略html标签自闭合
+    'vue/valid-v-for': 'warn',
+    'vue/require-v-for-key': 'warn',
+    'vue/attribute-hyphenation': 0,
+    'vue/max-attributes-per-line': [5, { singleline: 10, multiline: { max: 1, allowFirstLine: false } }], // 每行最大属性
+    'vue/singleline-html-element-content-newline': 'off',
+    'vue/multiline-html-element-content-newline': 'off',
+    'vue/html-closing-bracket-newline': 'off',
+    'vue/no-v-html': 'off',
+    'vue/html-self-closing': 0,
     'accessor-pairs': 2, // 应同时设置setter和getter
     'arrow-spacing': [2, { before: true, after: true }], // 箭头间距
     'vue/require-default-prop': 0, // 不检查默认属性
