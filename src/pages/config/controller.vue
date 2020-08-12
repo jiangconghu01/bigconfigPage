@@ -31,7 +31,13 @@
           ></el-button>
         </el-tooltip>
         <el-tooltip class="item" effect="dark" content="工具栏" placement="bottom-start" :open-delay="200">
-          <el-button size="mini" type="primary" icon="el-icon-s-cooperation"></el-button>
+          <el-button
+            :class="[isShowEditTools ? 'is-focus' : '']"
+            size="mini"
+            type="primary"
+            icon="el-icon-s-cooperation"
+            @click="haddleIsShowEditTools"
+          ></el-button>
         </el-tooltip>
       </div>
       <div class="header-infor">
@@ -121,9 +127,32 @@
 
       <!-- 页面主题编辑区--start -->
       <div class="main-panel-edit-container" @mousemove="movingEditContext">
+        <div class="edit-tools" :class="[isShowEditTools ? '' : 'hide2']">
+          <div class="buttons">
+            <el-tooltip class="item" effect="dark" content="删除" placement="bottom-start">
+              <el-button size="mini" type="primary" icon="el-icon-delete" @click="deleteActiveItem"></el-button>
+            </el-tooltip>
+            <el-tooltip class="item" effect="dark" content="重置" placement="bottom-start">
+              <el-button size="mini" type="primary" icon="el-icon-refresh-left"></el-button>
+            </el-tooltip>
+            <el-tooltip class="item" effect="dark" content="网格" placement="bottom-start">
+              <el-button
+                :class="[isShowGrid ? 'is-focus' : '']"
+                size="mini"
+                type="primary"
+                icon="el-icon-s-grid"
+                @click="haddleIsShowGrid"
+              ></el-button>
+            </el-tooltip>
+          </div>
+          <div class="slider-block">
+            <span class="demonstration">视图缩放</span>
+            <el-slider v-model="pageScale" :min="0" :max="2" :step="0.01" class="scale-silder"></el-slider>
+          </div>
+        </div>
         <div class="layout beauty-scroll">
           <el-scrollbar>
-            <div class="scrollbar-layout">
+            <div class="scrollbar-layout" :style="{ width: pageConfig.width * pageScale + 200 + 'px' }">
               <!-- <div v-if="configType === 'free'" class="main-panel-edit-container-context">
                 <vue-draggable-resizable v-for="item in Array.from({ length: 2 })" :key="item" :parent="true" :scale="0.4">
                   <p class="layout-box-item"></p>
@@ -132,8 +161,8 @@
                   <p id="layout-box-2" class="layout-box-item"></p>
                 </vue-draggable-resizable>
               </div> -->
-              <div class="main-panel-edit-container-context">
-                <component :is="fixTemplate" :options="pageConfig"></component>
+              <div class="main-panel-edit-container-context" :style="pageStyle" :class="[isShowGrid ? 'grid' : '']">
+                <component :is="fixTemplate" :options="pageConfig" @getCurrentActivedItem="getCurrentActived"></component>
               </div>
             </div>
           </el-scrollbar>
@@ -145,8 +174,66 @@
       <div v-show="isShowMuRightSeting" class="config-right-manager">
         <el-tabs type="border-card">
           <el-tab-pane>
+            <span slot="label"><i class="el-icon-document"></i>页面设置 </span>
+            <ul class="setting-page-param">
+              <li class="setting-item normal">
+                <span class="text">页面大小</span>
+                <span class="form-item">
+                  <el-input-number v-model="pageConfig.width" size="mini"></el-input-number>
+                  <el-input-number v-model="pageConfig.height" size="mini"></el-input-number>
+                </span>
+              </li>
+              <li class="setting-item">
+                <span class="text"></span>
+                <span class="form-item">
+                  <i class="layout-text">宽度</i>
+                  <i class="layout-text">高度</i>
+                </span>
+              </li>
+              <li class="setting-item normal">
+                <span class="text">背景颜色</span>
+                <span class="form-item">
+                  <el-input v-model="pageConfig.background.color" size="mini" placeholder="请输入内容" class="input-with-color">
+                    <p slot="prepend" class="color-view" :style="{ background: pageConfig.background.color }"></p>
+                    <el-color-picker slot="append" v-model="pageConfig.background.color" show-alpha size="mini"></el-color-picker>
+                  </el-input>
+                </span>
+              </li>
+              <li class="setting-item normal">
+                <span class="text">背景图片</span>
+                <span class="form-item">
+                  <el-input v-model="pageConfig.background.img" placeholder="请输入完整路径" size="mini">
+                    <template slot="prepend">http://</template>
+                  </el-input>
+                  <p class="select-img">
+                    <span>
+                      <i class="empty-pic el-icon-picture"> </i>
+                      <i class="text">点击选择图片</i>
+                    </span>
+                  </p>
+                </span>
+              </li>
+              <li class="setting-item normal">
+                <span class="text">重置</span>
+                <span class="form-item">
+                  <el-button class="reset-bg" type="primary" size="mini" @click="defaultBackground">恢复默认背景</el-button>
+                </span>
+              </li>
+              <li class="setting-item normal">
+                <span class="text">页面缩放方式</span>
+                <span class="form-item">
+                  <el-radio-group v-model="pageConfig.generateLayout">
+                    <el-radio label="fixwh">固定宽高</el-radio>
+                    <el-radio label="coverwh">满铺屏幕</el-radio>
+                    <el-radio label="scalewh">等比缩放</el-radio>
+                  </el-radio-group>
+                </span>
+              </li>
+            </ul>
+          </el-tab-pane>
+          <el-tab-pane>
             <span slot="label"><i class="el-icon-pie-chart"></i>图表样式 </span>
-            seting1
+            <chart-settings></chart-settings>
           </el-tab-pane>
           <el-tab-pane>
             <span slot="label"><i class="el-icon-coin"></i>数据来源 </span>
@@ -174,36 +261,56 @@ import FixedCommon from './configtemplate/fixed.layout.common'
 import FixedIncome from './configtemplate/fixed.layout.income'
 import FixedRemuneration from './configtemplate/fixed.layout.remuneration'
 import FreeCommon from './configtemplate/free.layout.common'
+import chartSettings from '../../components/config/page.chart.setting'
 export default {
   components: {
     FixedCommon,
     FixedIncome,
     FixedRemuneration,
     FreeCommon,
+    chartSettings,
   },
   data() {
     return {
       isShowMuLayout: true,
       isShowMuChart: true,
       isShowMuRightSeting: true,
+      isShowEditTools: true,
+      isShowGrid: true,
       leftChartList: chartList,
       leftLayoutList: layoutList,
       configType: 'fixed',
       fixTemplate: 'FixedCommon',
+      pageScale: 0.4,
       pageConfig: {
+        id: '',
+        status: 'empty_add',
+        title: '',
         width: 1920,
         height: 1080,
-        layoutType: '',
+        layoutType: 'fixed',
+        generateLayout: 'coverwh',
         coverImg: '',
         background: {
-          color: '',
+          color: 'rgba(26, 28, 32,1)',
           img: '',
         },
         children: [],
       },
+      activedInstanceDomIndex: '',
+      freeInstanceDeactivated: false,
     }
   },
-  computed: {},
+  computed: {
+    pageStyle() {
+      return {
+        width: this.pageConfig.width + 'px',
+        height: this.pageConfig.height + 'px',
+        backgroundColor: this.pageConfig.background.color,
+        transform: 'scale(' + this.pageScale + ') translateX(-50%) translateY(-50%)',
+      }
+    },
+  },
   created() {},
   mounted() {
     this.setLeftMuChartDraggable()
@@ -214,31 +321,60 @@ export default {
     // console.log(new ChartElement(2, 5, 'fff'), new BoxElement())
     // this.$ls.set('test', JSON.stringify(new ChartElement(2, 5, 'fff')))
   },
+  updated() {
+    this.$nextTick(function () {
+      console.log('updated')
+      this.setLeftMuChartDraggable()
+    })
+  },
   methods: {
     pagePicTest() {
       this.pageConfig.children[0].chartoption.color = ['#F56C6C', '#67C23A', '#67C23A']
     },
     previewPage() {
-      window.open('/generatepage.html#/index', '_blank')
+      const config = this.pageConfig
+      let mu = ''
+      if (this.configType == 'fixed') {
+        mu = 'fixed1page'
+      }
+      if (this.configType == 'free') {
+        mu = 'freepage'
+      }
+      //   this.$ls.set('current_page', JSON.stringify(config))
+      window.open(`/generatepage.html#/${mu}/${config.id}`, '_blank')
+    },
+    deleteActiveItem() {
+      const index = this.activedInstanceDomIndex
+      //   if (this.configType == 'free' && !this.freeInstanceDeactivated) {
+      if (this.configType == 'free') {
+        const cu_arr = this.pageConfig.children.filter((ele) => {
+          return ele.domindex != index
+        })
+        this.pageConfig.children = cu_arr
+      }
+    },
+    getCurrentActived(param) {
+      param !== 'deActived' && (this.activedInstanceDomIndex = param)
+      this.freeInstanceDeactivated = param === 'deActived'
     },
     movingEditContext() {},
     haddleIsShowMuLayout() {
       this.isShowMuLayout = !this.isShowMuLayout
-      this.$nextTick(() => {
-        this.setLeftMuChartDraggable()
-      })
     },
     haddleIsShowMuChart() {
       this.isShowMuChart = !this.isShowMuChart
-      this.$nextTick(() => {
-        this.setLeftMuChartDraggable()
-      })
     },
     haddleIsShowMuRightSeting() {
       this.isShowMuRightSeting = !this.isShowMuRightSeting
-      this.$nextTick(() => {
-        this.setLeftMuChartDraggable()
-      })
+    },
+    haddleIsShowEditTools() {
+      this.isShowEditTools = !this.isShowEditTools
+    },
+    haddleIsShowGrid() {
+      this.isShowGrid = !this.isShowGrid
+    },
+    defaultBackground() {
+      this.pageConfig.background.color = 'rgba(26, 28, 32,1)'
     },
     selectLayoutMethod(name) {
       if (name == this.fixTemplate) {
@@ -263,9 +399,10 @@ export default {
       //         message: '已取消删除',
       //       })
       //     })
-      this.configType = name === 'FreeCommon' ? 'free' : 'fixed'
+      this.configType = this.pageConfig.layoutType = name === 'FreeCommon' ? 'free' : 'fixed'
       this.fixTemplate = name
       this.pageConfig.children = []
+      this.activedInstanceDomIndex = ''
       this.$nextTick(() => {
         this.setLeftMuChartDraggable()
       })
@@ -277,8 +414,15 @@ export default {
       if (dom && isDroped && this.configType == 'fixed') {
         const ele = new BoxElement(type, index)
         type.indexOf('chart') > -1 && (ele.chartoption = JSON.parse(JSON.stringify(chartTypeMap[type])))
-        this.pageConfig.children.push(ele)
-        this.pageConfig = Object.assign({}, this.pageConfig)
+        const t_index = this.pageConfig.children.findIndex((item) => item.domindex == index)
+        //避免同一个框内覆盖元素后之数组元素未删除
+        if (t_index > -1) {
+          this.$set(this.pageConfig.children, t_index, ele)
+        } else {
+          this.pageConfig.children.push(ele)
+        }
+
+        // this.pageConfig = Object.assign({}, this.pageConfig)
       }
       if (this.configType == 'free') {
         const o = $('.free-layout-common-box').offset()
@@ -292,7 +436,7 @@ export default {
           const ele = new BoxElement(type)
           type.indexOf('chart') > -1 && (ele.chartoption = JSON.parse(JSON.stringify(chartTypeMap[type])))
           this.pageConfig.children.push(ele)
-          this.pageConfig = Object.assign({}, this.pageConfig)
+          //   this.pageConfig = Object.assign({}, this.pageConfig)
         }
       }
       this.$nextTick(() => {
@@ -336,6 +480,15 @@ export default {
             //   console.log(1234)
           },
         })
+      this.configType == 'fixed' &&
+        $('.main-panel-edit-container-context')
+          .off('click')
+          .on('click', '.target', function () {
+            $('.main-panel-edit-container-context .target').removeClass('jq-ui-state-hover')
+            $(this).addClass('jq-ui-state-hover')
+            const index = $(this).attr('index')
+            _vue_this.activedInstanceDomIndex = index
+          })
     },
   },
 }
@@ -524,17 +677,44 @@ export default {
       background: #1a1c20;
       transition: width 0.4s ease;
       overflow: hidden;
+      .edit-tools {
+        height: 34px;
+        width: 100%;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        background-color: #141213;
+        transition: all 0.3s ease, opacity 1s ease;
+        .buttons {
+          margin-left: 20px;
+        }
+        .slider-block {
+          width: 200px;
+          margin-right: 15px;
+          .demonstration {
+            display: block;
+            float: left;
+            line-height: 30px;
+            width: 50px;
+            text-align: center;
+          }
+          .scale-silder {
+            float: left;
+            width: 150px;
+          }
+        }
+      }
       .layout {
         width: 100%;
-        height: 100%;
+        height: calc(100% - 34px);
         overflow-x: auto;
         overflow-y: hidden;
         .scrollbar-layout {
           position: relative;
           width: 850px; //(1920 * 0.4)
           //   height: 460px;
-          height: calc(100% + 17px);
-          //   height: 100%;
+          //   height: calc(100% + 17px);
+          height: 100%;
           margin-bottom: -17px;
           overflow-y: hidden;
           margin-right: auto;
@@ -550,8 +730,7 @@ export default {
           height: 1080px;
           //   background-color: rgba(157, 188, 216, 0.137);
           //   background: linear-gradient(-90deg, rgba(83, 83, 189, 0.411) 1px, transparent 1px) 0% 0% / 10px 10px, linear-gradient(rgba(83, 83, 189, 0.411) 1px, transparent 1px) 0% 0% / 10px 10px;
-          background-image: linear-gradient(to bottom, #073249 0, #073249 1px, transparent 1px),
-            linear-gradient(to right, #0f2937 0, #0f2937 1px, transparent 1px);
+
           background-size: 10px 10px;
           background-repeat: repeat;
           position: absolute;
@@ -564,6 +743,10 @@ export default {
           transform: scale(0.4, 0.4) translateX(-50%) translateY(-50%);
           //   transform: scale(0.4, 0.4);
           transform-origin: 0 0;
+          &.grid {
+            background-image: linear-gradient(to bottom, #073249 0, #073249 1px, transparent 1px),
+              linear-gradient(to right, #0f2937 0, #0f2937 1px, transparent 1px);
+          }
         }
       }
     }
@@ -576,6 +759,60 @@ export default {
       transition: width 0.35s ease-in-out;
       overflow: hidden;
       box-shadow: -1px 0 #000;
+      .setting-page-param {
+        .setting-item {
+          display: flex;
+          &.normal {
+            margin-top: 15px;
+          }
+          .text {
+            width: 100px;
+            height: 22px;
+            line-height: 22px;
+          }
+          .form-item {
+            flex: 1;
+            .layout-text {
+              width: 98px;
+              height: 22px;
+              line-height: 22px;
+              display: inline-block;
+              text-align: center;
+            }
+            .input-with-color {
+              .color-view {
+                height: 20px;
+                width: 20px;
+                border: 1px solid #dcdfe6;
+              }
+              /deep/ .el-input-group__prepend {
+                padding: 0;
+              }
+            }
+            .select-img {
+              margin-top: 15px;
+              height: 150px;
+              background-color: #fff;
+              display: flex;
+              align-items: center;
+              justify-content: center;
+              span {
+                padding-left: 25px;
+                cursor: pointer;
+              }
+              .empty-pic {
+                font-size: 70px;
+              }
+              .text {
+                display: block;
+              }
+            }
+            .reset-bg {
+              font-size: 12px;
+            }
+          }
+        }
+      }
     }
   }
 }
@@ -637,11 +874,17 @@ export default {
   margin: 0;
 }
 .el-tabs__item {
+  padding: 0 15px;
   height: 32px;
   line-height: 32px;
   font-size: 12px;
   font-weight: normal;
   color: rgba(255, 255, 255, 0.808);
+}
+.el-tabs__nav-next,
+.el-tabs__nav-prev {
+  height: 32px;
+  line-height: 32px;
 }
 .el-tabs--border-card > .el-tabs__header .el-tabs__item.is-active {
   color: #409eff;
@@ -739,5 +982,98 @@ export default {
 .ref-line {
   background-color: rgba(243, 8, 196, 0.877);
   //   background-color: #409eff;
+}
+
+//右侧设置部分elementui样式修改
+.config-right-manager {
+  //修改计数器样式
+  .el-input-number--mini {
+    width: 98px;
+    line-height: 22px;
+  }
+  .link-w-h .el-input-number--mini {
+    width: 86px;
+    line-height: 22px;
+  }
+  .el-input-number--mini .el-input-number__decrease,
+  .el-input-number--mini .el-input-number__increase {
+    width: 16px;
+    //   background: #262c34;
+    //   border-color: #262c34;
+  }
+  .el-input--mini .el-input__inner {
+    height: 22px;
+    line-height: 22px;
+    border-radius: 0;
+    //   background-color: #262c34;
+    //   border-color: #262c34;
+  }
+  .el-input-number--mini .el-input__inner {
+    padding-left: 20px;
+    padding-right: 20px;
+  }
+  .el-input-number__decrease,
+  .el-input-number__increase {
+    top: 0;
+    border-radius: 0;
+  }
+
+  //修改input
+  .el-input-group__append,
+  .el-input-group__prepend {
+    padding: 0 10px;
+    border: none;
+  }
+  //修改拾色器
+  .el-color-picker--mini .el-color-picker__trigger {
+    height: 19px;
+    width: 19px;
+    padding: 0;
+  }
+  .el-color-picker--mini {
+    height: 20px;
+  }
+  .el-input-group--append .el-input__inner,
+  .el-input-group__prepend {
+    border-radius: 0;
+  }
+  .el-input-group--prepend .el-input__inner,
+  .el-input-group__append {
+    border-radius: 0;
+  }
+  // .el-color-dropdown.el-color-picker__panel {
+  //   .el-button--mini {
+  //     background: #fff;
+  //     border: 1px solid #dcdfe6;
+  //     color: #606266;
+  //   }
+  // }
+  //单选样式
+  .el-radio {
+    color: #a1aeb3;
+    font-size: 12px;
+    margin-right: 20px;
+    margin-top: 5px;
+  }
+}
+
+//修改
+.el-slider__runway {
+  height: 4px;
+  margin: 13px 0;
+}
+.el-slider__bar {
+  height: 4px;
+  background-color: rgba(28, 142, 241, 0);
+  background-image: linear-gradient(90deg, rgb(115, 239, 255) 0, rgb(43, 137, 255) 100%);
+}
+.el-slider__button-wrapper {
+  width: 24px;
+  height: 24px;
+  top: -10px;
+}
+.el-slider__button {
+  width: 12px;
+  height: 12px;
 }
 </style>

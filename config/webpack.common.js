@@ -7,27 +7,13 @@ const MPAConfig = require('./MPA.config.js')
 // const Purify=require('purifycss-webpack'); //css优化去重复无效代码
 // const glob=require('glob');  //css优化
 const isDev = process.env.NODE_ENV === 'development'
-const pluginsArr = [
-  new VueLoaderPlugin(),
-  ...MPAConfig.plugins,
-  // new Webpack.ProvidePlugin({
-  //   Vue: ['vue/dist/vue.esm.js', 'default']
-  // }),
-  // new HtmlWebpackPlugin({
-  //   title: 'proindex',
-  //   filename: 'proindex.html',
-  //   template:path.resolve(__dirname,'../template/index.html')
-  // })
-]
+const pluginsArr = [new VueLoaderPlugin(), ...MPAConfig.plugins]
 // !isDev && pluginsArr.push(
 //   new Purify({         //css优化去重去无效代码
 //   paths:glob.sync(path.join(__dirname,"../src/pages/*.vue"))
 // }));
 module.exports = {
   entry: MPAConfig.entry,
-  // entry: {
-  //     proindex: ['./src/proindex.js'],
-  // },
   output: {
     filename: isDev ? '[name].[hash].js' : '[name].[chunkhash].js',
     path: path.resolve(__dirname, '../dist'),
@@ -37,6 +23,7 @@ module.exports = {
     extensions: ['.json', '.js', '.jsx', '.vue'],
     alias: {
       '@': path.join(__dirname, '../src'),
+      //   xxx: path.join(__dirname, '../src'),
       pages: path.join(__dirname, '../src/pages'),
     },
   },

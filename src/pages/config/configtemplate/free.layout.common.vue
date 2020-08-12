@@ -1,6 +1,13 @@
 <template>
   <div class="free-layout-common-box">
-    <page-instance v-for="(item, index) in eleArray" :key="index + 'resize'" :config="item" @handleLine="asyncLine"></page-instance>
+    <page-instance
+      v-for="(item, index) in eleArray"
+      :key="index + 'resize'"
+      :config="item"
+      @handleLine="asyncLine"
+      @handlePosition="positionSizeChange"
+      v-on="$listeners"
+    ></page-instance>
     <!--辅助线-->
     <span
       v-for="(item, index) in vLine"
@@ -41,21 +48,38 @@ export default {
   },
   computed: {
     eleArray() {
-      return this.options.children.map((ele, index) => {
-        const t = ele
-        t['domindex'] = index
-        return t
-      })
+      //   return this.options.children.map((ele, index) => {
+      //     const t = ele
+      //     t['domindex'] = index
+      //     return t
+      //   })
+      return this.options.children
+    },
+  },
+  watch: {
+    options: {
+      handler(val, old) {
+        // console.log('layout:', val)
+        this.ayncLocalData(val)
+      },
+      deep: true,
     },
   },
   created() {},
-  mounted() {},
+  mounted() {
+    !this.options.id && (this.options.id = this.$uuidv4())
+  },
   methods: {
     asyncLine(param) {
       const { vLine, hLine } = param
       this.vLine = vLine
       this.hLine = hLine
-      console.log(vLine, hLine)
+    },
+    ayncLocalData(val) {
+      this.$ls.set('current_page', JSON.stringify(val))
+    },
+    positionSizeChange() {
+      // this.$ls.set('current_page', JSON.stringify(this.options))
     },
   },
 }

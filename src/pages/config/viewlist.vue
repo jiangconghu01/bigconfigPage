@@ -1,7 +1,5 @@
 <template>
-  <div>
-    测试生成页面
-  </div>
+  <div></div>
 </template>
 <script>
 export default {
@@ -15,4 +13,4 @@ export default {
   methods: {},
 }
 </script>
-<style lang="scss"></style>
+<style lang=""></style>

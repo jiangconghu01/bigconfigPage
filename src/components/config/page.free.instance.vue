@@ -6,13 +6,15 @@
     :handle-info="{ size: 10, offset: -5, switch: true }"
     :snap="true"
     :snap-tolerance="10"
-    :x="positon.x"
-    :y="positon.y"
-    :w="positon.w"
-    :h="positon.h"
+    :x="position.x"
+    :y="position.y"
+    :w="position.w"
+    :h="position.h"
     @resizing="onResize"
     @dragging="onDrag"
     @refLineParams="getRefLineParams"
+    @activated="onActivated"
+    @deactivated="onDeactivated"
   >
     <div class="layout-box-item target-context">
       <el-button v-if="config.type == 'button'" size="mini">按钮</el-button>
@@ -70,7 +72,8 @@ export default {
       ],
       chartBox: null,
       resizeTimer: null,
-      positon: {
+      initTimer: null,
+      position: {
         x: 760,
         y: 410,
         w: 400,
@@ -86,14 +89,25 @@ export default {
   watch: {
     config: {
       handler: function (nv, ov) {
-        nv.type.indexOf('chart') > -1 && this.initChart()
+        this.position = nv.position
+        if (nv.type.indexOf('chart') > -1) {
+          this.initTimer && clearTimeout(this.initTimer)
+          this.initTimer = setTimeout(() => {
+            this.initChart()
+          }, 500)
+        }
       },
       deep: true,
       immediate: true,
     },
+    position() {
+      //   console.log('33333333333')
+      //   this.$emit('handlePosition')
+    },
   },
   mounted() {
     console.log(this.config)
+    this.position = this.config.position
   },
   methods: {
     casecaderHandleChange(d) {
@@ -105,6 +119,7 @@ export default {
         this.$nextTick(() => {
           this.chartBox = this.$echarts.init(document.getElementById(this.chartid))
           this.chartBox.clear()
+          this.chartBox.resize()
           this.chartBox.setOption(this.config.chartoption)
         })
       }
@@ -115,18 +130,27 @@ export default {
       })
     },
     onResize(x, y, w, h) {
-      this.positon = { x, y, w, h }
+      //   this.position = { x, y, w, h }
+      this.config.position = { x, y, w, h }
       this.resizeTimer && clearTimeout(this.resizeTimer)
       this.resizeTimer = setTimeout(() => {
         this.resizeChartBox()
       }, 300)
     },
     onDrag: function (x, y) {
-      this.positon.x = x
-      this.positon.y = y
+      //   this.position.x = x
+      //   this.position.y = y
+      this.config.position.x = x
+      this.config.position.y = y
     },
     getRefLineParams(params) {
       this.$emit('handleLine', params)
+    },
+    onActivated() {
+      this.$emit('getCurrentActivedItem', this.config.domindex)
+    },
+    onDeactivated() {
+      this.$emit('getCurrentActivedItem', 'deActived')
     },
   },
 }

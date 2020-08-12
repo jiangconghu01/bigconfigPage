@@ -25,7 +25,6 @@
   </div>
 </template>
 <script>
-import { chartTypeMap } from '@/pages/config/page.chart.type.map'
 export default {
   props: {
     config: {
@@ -82,6 +81,7 @@ export default {
         this.$nextTick(() => {
           this.instance = this.$echarts.init(document.getElementById(this.chartid))
           this.instance.clear()
+          this.instance.resize()
           this.instance.setOption(this.config.chartoption)
         })
       }

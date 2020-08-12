@@ -18,7 +18,6 @@ export default {
 <style lang="scss">
 @import url('./css/reset.scss');
 .app {
-  overflow: hidden;
   height: 100%;
 }
 </style>

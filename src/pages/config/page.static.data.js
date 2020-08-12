@@ -2,7 +2,7 @@ const layoutList = [
   {
     name: '自由布局',
     tempName: 'FreeCommon',
-    bgimg: require('../../static/free.png'),
+    bgimg: require('@/static/free.png'),
   },
   {
     name: '布局模板一',
@@ -82,6 +82,8 @@ const chartList = [
       {
         label: '区域折线图',
         bgimg: require('../../static/line_3.png'),
+        useable: true,
+        type: 'chart_line_1',
       },
     ],
   },

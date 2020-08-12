@@ -14,13 +14,13 @@ import vdr from 'vue-draggable-resizable-gorkys'
 import 'vue-draggable-resizable-gorkys/dist/VueDraggableResizable.css'
 
 import VueLocalStorage from 'vue-localstorage'
-
+import { v4 as uuidv4 } from 'uuid'
 Vue.component('vue-draggable-resizable', vdr)
 Vue.use(VueLocalStorage, {
   name: 'ls',
   bind: true, //created computed members from your variable declarations
 })
-
+Vue.prototype.$uuidv4 = uuidv4
 Vue.prototype.$http = http
 Vue.prototype.$echarts = Echarts
 Element(Vue)

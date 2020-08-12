@@ -1,5 +1,5 @@
 <template>
-  <div class="fixed-layout-common-box">
+  <div ref="dombox" class="fixed-layout-common-box generate-page-box" :style="pageStyle">
     <div class="header">
       <div class="title target 0" index="0">
         <page-instance :config="eleArray.data0"></page-instance>
@@ -29,21 +29,46 @@
 <script>
 import pageInstance from '@/components/config/page.fixed.instance.vue'
 export default {
-  name: 'FixedCommon',
+  name: 'GenertateFixedCommon',
   components: {
     pageInstance,
   },
-  props: {
-    options: {
-      type: Object,
-      required: true,
-      default: () => {},
-    },
-  },
+  props: {},
   data() {
-    return {}
+    return {
+      options: {},
+      width: '',
+      height: '',
+    }
   },
   computed: {
+    pageStyle() {
+      let style = null
+      if (this.options.generateLayout == 'coverwh') {
+        style = { backgroundColor: this.options.background.color }
+      }
+      if (this.options.generateLayout == 'fixwh') {
+        style = {
+          width: this.options.width + 'px',
+          height: this.options.height + 'px',
+          backgroundColor: this.options.background.color,
+        }
+      }
+      if (this.options.generateLayout == 'scalewh') {
+        const w1 = this.options.width
+        const h1 = this.options.height
+        const w2 = this.width
+        const h2 = this.height
+        const s = w2 / w1 >= h2 / h1 ? h2 / h1 : w2 / w1
+        style = {
+          width: this.options.width * s + 'px',
+          height: this.options.height * s + 'px',
+          backgroundColor: this.options.background.color,
+          //   transform: 'scale(' + s + ')',
+        }
+      }
+      return style
+    },
     eleArray() {
       const t = {
         data0: { type: '' },
@@ -64,19 +89,16 @@ export default {
       return t
     },
   },
-  watch: {
-    options: {
-      handler(val, old) {
-        // console.log('layout:', val)
-        this.$ls.set('current_page', JSON.stringify(val))
-      },
-      deep: true,
-    },
+  created() {
+    this.options = JSON.parse(this.$ls.get('current_page'))
   },
-  created() {},
   mounted() {
-    !this.options.id && (this.options.id = this.$uuidv4())
+    // !this.options.id && (this.options.id = this.$uuidv4())
     // console.log(this.options)
+    // this.width = this.$refs.dombox.clientWidth
+    // this.height = this.$refs.dombox.clientHeight
+    this.width = document.querySelector('body').clientWidth
+    this.height = document.querySelector('body').clientHeight
   },
   methods: {},
 }
