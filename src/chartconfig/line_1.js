@@ -1,5 +1,15 @@
 import echarts from 'echarts'
 const option = {
+  title: {
+    show: true,
+    text: 'XXX',
+    textStyle: {
+      fontWeight: 'normal',
+      fontSize: 16,
+      color: '#F1F1F3',
+    },
+    left: '1.5%',
+  },
   tooltip: {
     trigger: 'axis',
     axisPointer: {
@@ -10,7 +20,7 @@ const option = {
   },
   legend: {
     top: '0%',
-    data: ['安卓', 'IOS'],
+    data: ['IOS'],
     textStyle: {
       color: 'rgba(255,255,255,.5)',
       fontSize: '12',
@@ -23,14 +33,14 @@ const option = {
     bottom: '10',
     containLabel: true,
   },
-
+  color: ['#0A73FF', '#3DABFF', '#43CCFF'],
   xAxis: [
     {
       type: 'category',
       boundaryGap: false,
       axisLabel: {
         textStyle: {
-          color: 'rgba(255,255,255,.6)',
+          //   color: 'rgba(255,255,255,.6)',
           fontSize: 12,
         },
       },
@@ -61,7 +71,7 @@ const option = {
       },
       axisLabel: {
         textStyle: {
-          color: 'rgba(255,255,255,.6)',
+          //   color: 'rgba(255,255,255,.6)',
           fontSize: 12,
         },
       },

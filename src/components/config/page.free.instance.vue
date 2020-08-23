@@ -10,6 +10,8 @@
     :y="position.y"
     :w="position.w"
     :h="position.h"
+    :style="unitStyle"
+    :class="config.frame"
     @resizing="onResize"
     @dragging="onDrag"
     @refLineParams="getRefLineParams"
@@ -74,8 +76,8 @@ export default {
       resizeTimer: null,
       initTimer: null,
       position: {
-        x: 760,
-        y: 410,
+        x: 0,
+        y: 0,
         w: 400,
         h: 260,
       },
@@ -85,10 +87,13 @@ export default {
     chartid() {
       return this.config.domindex === undefined || this.config.domindex === '' ? 'chart-dom-empty' : 'chart-dom-' + this.config.domindex
     },
+    unitStyle() {
+      return { backgroundColor: this.config.background, opacity: this.config.opacity }
+    },
   },
   watch: {
     config: {
-      handler: function (nv, ov) {
+      handler(nv, ov) {
         this.position = nv.position
         if (nv.type.indexOf('chart') > -1) {
           this.initTimer && clearTimeout(this.initTimer)
@@ -159,6 +164,9 @@ export default {
 .target-context {
   width: 100%;
   height: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
   .chart-init-box {
     width: 100%;
     height: 100%;

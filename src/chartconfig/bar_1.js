@@ -1,14 +1,19 @@
 import echarts from 'echarts'
 const option = {
   title: {
-    // text: '数量',
+    show: true,
+    text: 'XXX',
     textStyle: {
       fontWeight: 'normal',
       fontSize: 16,
       color: '#F1F1F3',
     },
-    top: '10%',
     left: '1.5%',
+  },
+  textStyle: {
+    color: '#fff',
+    fontSize: 'normal',
+    fontWeight: 'normal',
   },
   tooltip: {
     trigger: 'axis',
@@ -17,11 +22,12 @@ const option = {
     },
   },
   grid: {
-    top: 45,
-    right: '4%',
-    left: 80,
-    bottom: 55,
+    left: '50',
+    right: '10%',
+    top: '60',
+    bottom: '60',
   },
+  color: ['#0A73FF'],
   xAxis: [
     {
       type: 'category',
@@ -35,7 +41,7 @@ const option = {
         interval: 0,
         rotate: 25,
         margin: 10,
-        color: '#e2e9ff',
+        // color: '#e2e9ff',
         textStyle: {
           fontSize: 14,
         },
@@ -47,7 +53,7 @@ const option = {
       splitNumber: 3,
       axisLabel: {
         formatter: '{value}',
-        color: '#e2e9ff',
+        // color: '#e2e9ff',
       },
       axisLine: {
         lineStyle: {
@@ -70,7 +76,7 @@ const option = {
       label: {
         show: true,
         position: 'top',
-        color: 'rgba(255,255,255,0.8)',
+        // color: 'rgba(255,255,255,0.8)',
         fontSize: 10,
       },
       itemStyle: {},

@@ -1,5 +1,5 @@
 <template>
-  <div class="target-context">
+  <div class="target-context" :style="unitStyle" :class="config.frame">
     <el-button v-if="config.type == 'button'" size="mini">按钮</el-button>
     <el-select v-else-if="config.type == 'select'" v-model="value1" placeholder="请选择">
       <el-option v-for="item in selectoption" :key="item.value" :label="item.label" :value="item.value"> </el-option>
@@ -58,6 +58,9 @@ export default {
     chartid() {
       return this.config.domindex === undefined || this.config.domindex === '' ? 'chart-dom-empty' : 'chart-dom-' + this.config.domindex
     },
+    unitStyle() {
+      return { backgroundColor: this.config.background, opacity: this.config.opacity }
+    },
   },
   watch: {
     config: {
@@ -68,9 +71,7 @@ export default {
       immediate: true,
     },
   },
-  mounted() {
-    console.log(this.config)
-  },
+  mounted() {},
   methods: {
     casecaderHandleChange(d) {
       console.log(d)
@@ -98,6 +99,9 @@ export default {
 .target-context {
   width: 100%;
   height: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
   .chart-init-box {
     width: 100%;
     height: 100%;

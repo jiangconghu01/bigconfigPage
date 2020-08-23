@@ -16,11 +16,6 @@ module.exports = merge(common, {
     host: '0.0.0.0',
     port: 9000,
     proxy: {
-      //   '/areas_v2': {
-      //     target: 'https://geo.datav.aliyun.com/',
-      //     // changeOrigin: true,
-      //     secure: true, // 设置支持https协议的代理
-      //   },
       '/login': {
         target: baseTestUrl,
         changeOrigin: false,

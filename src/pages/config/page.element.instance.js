@@ -5,19 +5,21 @@ export class BoxElement {
     domindex = uuidv4(),
     frame = '',
     background = '',
+    opacity = 1,
     chartoption = {},
     componentoption = {},
     position = {
-      x: 760,
-      y: 410,
-      w: 400,
-      h: 260,
+      x: 560,
+      y: 310,
+      w: 320,
+      h: 200,
     }
   ) {
     this.type = type
     this.domindex = domindex
     this.frame = frame
     this.background = background
+    this.opacity = opacity
     this.chartoption = chartoption
     this.componentoption = componentoption
     this.position = position

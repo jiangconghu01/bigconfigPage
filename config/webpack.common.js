@@ -39,7 +39,7 @@ module.exports = {
           chunks: 'initial',
           minSize: 0, //代码最小多大，进行抽离
           minChunks: 2, //代码复 2 次以上的抽离
-          priority: 1,
+          priority: -11,
         },
         echarts: {
           chunks: 'initial',
@@ -151,12 +151,11 @@ module.exports = {
             loader: 'url-loader',
             options: {
               esModule: false,
-              limit: 1024 * 3, // 3k一下的图片转为bs64编码
+              limit: 1024 * 3,
               name: 'resources/[name].[hash:8].[ext]',
             },
           },
           //   {
-          //     // 压缩图片
           //     loader: 'image-webpack-loader',
           //     options: {
           //       disable: false,

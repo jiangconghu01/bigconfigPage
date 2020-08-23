@@ -1,7 +1,7 @@
 <template>
   <div class="fixed-layout-common-box">
     <div class="header">
-      <div class="title target 0" index="0">
+      <div class="title target 0 bg_title" index="0">
         <page-instance :config="eleArray.data0"></page-instance>
       </div>
       <div class="date target 1" index="1">

@@ -111,9 +111,9 @@ export default {
   //   background: #000d4a url(../../../static/temp_common_bg.jpg) center top;
   background-size: cover;
   color: rgb(212, 208, 208);
-  .target {
-    background-color: rgba(218, 230, 230, 0.11);
-  }
+  //   .target {
+  //     background-color: rgba(218, 230, 230, 0.11);
+  //   }
   & > div {
     position: absolute;
   }

@@ -11,7 +11,10 @@ export default {
   },
   computed: {},
   created() {},
-  mounted() {},
+  mounted() {
+    // console.log(2323232)
+    // this.$http.post('/fs', [{ aaa: 2323, bbb: [{ a: '23' }] }])
+  },
   methods: {},
 }
 </script>

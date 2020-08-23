@@ -152,7 +152,10 @@
         </div>
         <div class="layout beauty-scroll">
           <el-scrollbar>
-            <div class="scrollbar-layout" :style="{ width: pageConfig.width * pageScale + 200 + 'px' }">
+            <div
+              class="scrollbar-layout"
+              :style="{ width: pageConfig.width * pageScale + 200 + 'px', height: pageConfig.height * pageScale + 200 + 'px' }"
+            >
               <!-- <div v-if="configType === 'free'" class="main-panel-edit-container-context">
                 <vue-draggable-resizable v-for="item in Array.from({ length: 2 })" :key="item" :parent="true" :scale="0.4">
                   <p class="layout-box-item"></p>
@@ -232,12 +235,27 @@
             </ul>
           </el-tab-pane>
           <el-tab-pane>
-            <span slot="label"><i class="el-icon-pie-chart"></i>图表样式 </span>
-            <chart-settings></chart-settings>
+            <span slot="label"><i class="el-icon-pie-chart"></i>单元样式 </span>
+            <div class="beauty-scroll">
+              <el-scrollbar>
+                <chart-settings
+                  :chartSettinOptins="chartSettinOptins"
+                  :currentChartItem="currentChartItem"
+                  @chartOptionsChange="chartOptionsChange"
+                ></chart-settings>
+              </el-scrollbar>
+            </div>
           </el-tab-pane>
           <el-tab-pane>
             <span slot="label"><i class="el-icon-coin"></i>数据来源 </span>
-            seting2
+            <ul class="setting-page-param">
+              <li class="setting-item normal">
+                <span class="text">接口url</span>
+                <span class="form-item item-normal-input w100">
+                  <el-input placeholder="请输入url"></el-input>
+                </span>
+              </li>
+            </ul>
           </el-tab-pane>
           <el-tab-pane>
             <span slot="label"><i class="el-icon-s-tools"></i>交互事件 </span>
@@ -279,15 +297,15 @@ export default {
       isShowGrid: true,
       leftChartList: chartList,
       leftLayoutList: layoutList,
-      configType: 'fixed',
-      fixTemplate: 'FixedCommon',
+      configType: 'free',
+      fixTemplate: 'FreeCommon',
       pageScale: 0.4,
       pageConfig: {
         id: '',
         status: 'empty_add',
         title: '',
-        width: 1920,
-        height: 1080,
+        width: 1366,
+        height: 768,
         layoutType: 'fixed',
         generateLayout: 'coverwh',
         coverImg: '',
@@ -310,6 +328,16 @@ export default {
         transform: 'scale(' + this.pageScale + ') translateX(-50%) translateY(-50%)',
       }
     },
+    chartSettinOptins() {
+      return {
+        pageType: this.configType,
+      }
+    },
+    currentChartItem() {
+      return this.pageConfig.children.find((ele) => {
+        return ele.domindex == this.activedInstanceDomIndex
+      })
+    },
   },
   created() {},
   mounted() {
@@ -323,11 +351,13 @@ export default {
   },
   updated() {
     this.$nextTick(function () {
-      console.log('updated')
       this.setLeftMuChartDraggable()
     })
   },
   methods: {
+    chartOptionsChange(param) {
+      console.log(param)
+    },
     pagePicTest() {
       this.pageConfig.children[0].chartoption.color = ['#F56C6C', '#67C23A', '#67C23A']
     },
@@ -409,18 +439,16 @@ export default {
     },
     initPageEleInstance(type, isDroped, ui) {
       const dom = $('.main-panel-edit-container-context .jq-ui-state-hover').eq(0)
-      //   const init_dom = dom[0]
-      const index = dom.attr('index')
       if (dom && isDroped && this.configType == 'fixed') {
+        const index = dom.attr('index')
         const ele = new BoxElement(type, index)
         type.indexOf('chart') > -1 && (ele.chartoption = JSON.parse(JSON.stringify(chartTypeMap[type])))
         const t_index = this.pageConfig.children.findIndex((item) => item.domindex == index)
-        //避免同一个框内覆盖元素后之数组元素未删除
-        if (t_index > -1) {
-          this.$set(this.pageConfig.children, t_index, ele)
-        } else {
-          this.pageConfig.children.push(ele)
-        }
+        //避免同一个框内拖动生成覆盖元素后之数组元素未删除
+        const isExit = t_index > -1
+        this.activedInstanceDomIndex = index
+        isExit && this.$set(this.pageConfig.children, t_index, ele)
+        !isExit && this.pageConfig.children.push(ele)
 
         // this.pageConfig = Object.assign({}, this.pageConfig)
       }
@@ -428,20 +456,26 @@ export default {
         const o = $('.free-layout-common-box').offset()
         const w = $('.free-layout-common-box').width()
         const h = $('.free-layout-common-box').height()
-        const area = [o.left, o.left + w * 0.4, o.top, o.top + h * 0.4]
+        const scale = this.pageScale
+        const area = [o.left, o.left + w * scale, o.top, o.top + h * scale]
         const x = ui.position.left
         const y = ui.position.top
+
         const isHover = !(x < area[0] || x > area[1] || y < area[2] || y > area[3])
         if (isHover) {
+          const t_x = Math.round((x - area[0]) / scale)
+          const t_y = Math.round((y - area[2]) / scale)
           const ele = new BoxElement(type)
+          ele.position.x = t_x
+          ele.position.y = t_y
           type.indexOf('chart') > -1 && (ele.chartoption = JSON.parse(JSON.stringify(chartTypeMap[type])))
           this.pageConfig.children.push(ele)
           //   this.pageConfig = Object.assign({}, this.pageConfig)
         }
       }
-      this.$nextTick(() => {
-        this.setLeftMuChartDraggable()
-      })
+      //   this.$nextTick(() => {
+      //     this.setLeftMuChartDraggable()
+      //   })
     },
     setLeftMuChartDraggable() {
       //   $('.main-panel-edit-container-context').draggable()
@@ -677,6 +711,7 @@ export default {
       background: #1a1c20;
       transition: width 0.4s ease;
       overflow: hidden;
+      overflow-y: auto;
       .edit-tools {
         height: 34px;
         width: 100%;
@@ -759,7 +794,18 @@ export default {
       transition: width 0.35s ease-in-out;
       overflow: hidden;
       box-shadow: -1px 0 #000;
+      /deep/ .el-tabs {
+        height: 100%;
+      }
+      /deep/ .el-tabs__content {
+        height: 100%;
+        overflow-y: auto;
+        .el-tab-pane {
+          height: 100%;
+        }
+      }
       .setting-page-param {
+        padding: 15px;
         .setting-item {
           display: flex;
           &.normal {
@@ -856,6 +902,12 @@ export default {
 .el-tooltip__popper.is-dark[x-placement^='left'] .popper__arrow::after {
   border-left-color: #409eff;
 }
+.el-tooltip__popper.is-dark[x-placement^='top'] .popper__arrow {
+  border-top-color: #409eff;
+}
+.el-tooltip__popper.is-dark[x-placement^='top'] .popper__arrow::after {
+  border-top-color: #409eff;
+}
 .el-tooltip__popper {
   border-radius: 0px;
   padding: 5px 10px;
@@ -921,6 +973,9 @@ export default {
     padding: 2px 10px 16px 10px;
     font-size: 18px;
   }
+}
+.el-tabs--border-card > .el-tabs__content {
+  padding: 0;
 }
 //修改jq-ui
 .chart-list-item.ui-draggable {
@@ -1073,7 +1128,9 @@ export default {
   top: -10px;
 }
 .el-slider__button {
-  width: 12px;
-  height: 12px;
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  border: 1px solid #409eff;
 }
 </style>
